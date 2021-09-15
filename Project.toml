@@ -1,0 +1,13 @@
+name = "LeastSquaresEstimation"
+uuid = "555dfdc7-c3d1-4f7e-afe4-732afd2d1449"
+authors = ["Grant Hecht <granthec@buffalo.edu> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.6"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
