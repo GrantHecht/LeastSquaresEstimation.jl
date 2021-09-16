@@ -2,6 +2,7 @@ module LeastSquaresEstimation
 
 using LinearAlgebra
 using StaticArrays
+using Zygote
 
 # Types used as constructor flags (Move to sep. file later)
 abstract type SequentialEstimatorForm end
