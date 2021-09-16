@@ -12,10 +12,12 @@ struct CovarianceForm <: SequentialEstimatorForm end
 include("LinearLeastSquares.jl")
 include("WeightedLinearLeastSquares.jl")
 include("SequentialLinearLeastSquares.jl")
+include("NonLinearLeastSquares.jl")
 
 export LinearLeastSquares
 export WeightedLinearLeastSquares
 export SequentialLinearLeastSquares
+export NonLinearLeastSquares
 export InformationForm
 export CovarianceForm
 export FeedMeasurementBatch!

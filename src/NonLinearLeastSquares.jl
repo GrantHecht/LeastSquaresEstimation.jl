@@ -37,7 +37,7 @@ mutable struct NonLinearLeastSquares{BFVT, BFJVT}
     iMax::Int
 end
 
-mutable struct ADNonLinearLeastSquares
+mutable struct ADNonLinearLeastSquares{BFVT} <: AbstractNonLinearLeastSquares
     # Basis functions where f[i] ∀ i ∈ [0, n] should be a function 
     # which takes the state and independant
     # variable as arguments (i.e f[i](x,tₖ) where tₖ is the time at 
@@ -74,17 +74,17 @@ function NonLinearLeastSquares(f::AbstractVector, h::AbstractMatrix, xhat::Abstr
     if k != kh
         throw(ArgumentError("Provided jacobian does not have the correct number of rows."))
     end
-    if n != nk
+    if n != nh
         throw(ArgumentError("Provided jacobian does not have the correct number of columns."))
     end
 
     NonLinearLeastSquares(f,h,Matrix{Float64}(undef, (0,0)), xhat, Vector{Float64}(undef, (0,0)), 
-        Matrix{Float64}(undef, (0,0)), Vector{Float64}(undef, 0), ϵ, iMax)
+        Symmetric(Matrix{Float64}(undef, (0,0))), Vector{Float64}(undef, 0), ϵ, iMax)
 end
 
 function NonLinearLeastSquares(f::AbstractVector, xhat::AbstractVector; ϵ = 1e-6, iMax = 100)
-    ADNonLinearLeastSquares(f, Matrix{Float64}(undef, (0,0)), xhat, Vector{Float64}(undef, (0,0)), 
-        Matrix{Float64}(undef, (0,0)), Vector{Float64}(undef, 0), ϵ, iMax)
+    ADNonLinearLeastSquares(f, Matrix{Float64}(undef, (0,0)), xhat, Vector{Float64}(undef, 0), 
+        Symmetric(Matrix{Float64}(undef, (0,0))), Vector{Float64}(undef, 0), ϵ, iMax)
 end
 
 function FeedMeasurementBatch!(nlls::AbstractNonLinearLeastSquares, ys::AbstractVector, W::AbstractMatrix, ts::AbstractVector)
@@ -113,9 +113,10 @@ function ComputeEstimate!(nlls::AbstractNonLinearLeastSquares)
 
     # Get requirements
     conv = false
+    n  = length(nlls.xhat)
     ml = length(nlls.t)
-    m  = lenfth(nlls.y)
-    p  = lenfth(nlls.f)
+    m  = length(nlls.y)
+    p  = length(nlls.f)
     iter = 0
 
     # Allocate memory 
@@ -133,11 +134,12 @@ function ComputeEstimate!(nlls::AbstractNonLinearLeastSquares)
 
         # Fill H 
         fillH!(nlls)
+        display(nlls.H)
 
         # Fill expected measurements 
         @inbounds for i in 1:ml
             for j in 1:p
-                fxc[(i-1) + j] = nlls.f[j](nlls.xhat, nlls.t[i])
+                fxc[(i-1)*p + j] = nlls.f[j](nlls.xhat, nlls.t[i])
             end
         end
 
@@ -146,9 +148,13 @@ function ComputeEstimate!(nlls::AbstractNonLinearLeastSquares)
         mul!(tv1, nlls.W, Δyc)
         Jc = dot(Δyc, tv1)
 
-        # Compute change in local cost function
+        # Compute change in local cost function and print
         δJc = abs(Jc - Jco)
-        Jco = J
+        Jco = Jc
+        println("Iteration #: " * string(iter) * 
+                " δJ: " * string(δJc))
+
+        # Check for convergence
         if δJc < nlls.ϵ / norm(nlls.W)
             conv = true
         else
@@ -176,7 +182,7 @@ function fillH!(nlls::NonLinearLeastSquares)
     @inbounds for i in 1:ml
         for j in 1:p
             for k in 1:n
-                nlls.H[(i - 1) + j,k] = nlls.h[j,k](nlls.xhat, nlls.t[i])
+                nlls.H[(i - 1)*p + j,k] = nlls.h[j,k](nlls.xhat, nlls.t[i])
             end
         end
     end
@@ -192,9 +198,9 @@ function fillH!(nlls::ADNonLinearLeastSquares)
     # Fill 
     @inbounds for i in 1:ml
         for j in 1:p
-            grad = gradient(x -> nlls.f[j](x, nlls.t[i]), nlls.xhat)
+            grad = gradient(x -> nlls.f[j](x, nlls.t[i]), nlls.xhat)[1]
             for k in 1:n
-                H[(i - 1) + j,k] = grad[k]
+                nlls.H[(i - 1)*p + j,k] = grad[k]
             end
         end
     end   
