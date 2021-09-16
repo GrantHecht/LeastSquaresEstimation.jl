@@ -13,6 +13,16 @@ function main()
              x[3]*exp(x[8]*t)*sin(x[11]*t + x[14]) + x[5]
     f = [θ, ϕ]
 
+    # Define basis function jacobian
+    dtdk1(x,t) = exp(x[6]*t)*cos(x[9]*t + x[12])
+    dtdk2(x,t) = exp(x[7]*t)*cos(x[10]*t + x[13])
+    dtdk3(x,t) = exp(x[8]*t)*cos(x[11]*t + x[14])
+    dtdk4(x,t) = 1.0
+    dtdk5(x,t) = 0.0
+    dtdλ1(x,t) = x[1]*t*exp(x[6]*t)*cos(x[9]*t + x[12]) 
+    dtdλ2(x,t) = x[2]*t*exp(x[7]*t)*cos(x[10]*t + x[13])
+    dtdλ3(x,t) = x[3]*t*exp(x[8]*t)*cos(x[11]*t + x[14])
+
     # Instantiate Linear Least Squares Estimator
     xhat0 = [0.5, 0.25, 0.125, 0.0, 0.0, -0.15, 0.06, 
             -0.03, 0.26, 0.55, 0.95, 0.01, 0.01, 0.01]

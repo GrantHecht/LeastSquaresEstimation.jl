@@ -134,7 +134,6 @@ function ComputeEstimate!(nlls::AbstractNonLinearLeastSquares)
 
         # Fill H 
         fillH!(nlls)
-        display(nlls.H)
 
         # Fill expected measurements 
         @inbounds for i in 1:ml
@@ -166,7 +165,7 @@ function ComputeEstimate!(nlls::AbstractNonLinearLeastSquares)
             ldiv!(Δx, fm, tv2)
 
             # Update
-            nlls.xhat .= Δx
+            nlls.xhat .+= Δx
         end
     end
 
@@ -206,4 +205,12 @@ function fillH!(nlls::ADNonLinearLeastSquares)
     end   
 
     return nothing
+end
+
+function GetMeasurementEstimate(nlls::AbstractNonLinearLeastSquares, t::AbstractFloat)
+    return [nlls.f[i](nlls.xhat, t) for i in 1:length(nlls.f)]
+end
+
+function GetEstimate(nlls::AbstractNonLinearLeastSquares)
+    return nlls.xhat
 end
