@@ -19,7 +19,7 @@ function main()
     nllse = NonLinearLeastSquares(f, xhat0)
 
     # Generate Measurements
-    ft(x,t) = [f[1](x,t), f[2](x,t)] .+ 0.0008.*randn(2)
+    ft(x,t) = [f[1](x,t), f[2](x,t)] .+ 0.0005.*randn(2)
     m    = 200
     p    = length(f)
     xt   = [0.2, 0.1, 0.05, 0.0001, 0.0001, -0.1, -0.05, 

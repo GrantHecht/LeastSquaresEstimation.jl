@@ -22,11 +22,33 @@ function main()
     dtdλ1(x,t) = x[1]*t*exp(x[6]*t)*cos(x[9]*t + x[12]) 
     dtdλ2(x,t) = x[2]*t*exp(x[7]*t)*cos(x[10]*t + x[13])
     dtdλ3(x,t) = x[3]*t*exp(x[8]*t)*cos(x[11]*t + x[14])
+    dtdω1(x,t) = -x[1]*t*exp(x[6]*t)*sin(x[9]*t + x[12]) 
+    dtdω2(x,t) = -x[2]*t*exp(x[7]*t)*sin(x[10]*t + x[13]) 
+    dtdω3(x,t) = -x[3]*t*exp(x[8]*t)*sin(x[11]*t + x[14]) 
+    dtdδ1(x,t) = -x[1]*exp(x[6]*t)*sin(x[9]*t + x[12]) 
+    dtdδ2(x,t) = -x[2]*exp(x[7]*t)*sin(x[10]*t + x[13]) 
+    dtdδ3(x,t) = -x[3]*exp(x[8]*t)*sin(x[11]*t + x[14]) 
+    dpdk1(x,t) = exp(x[6]*t)*sin(x[9]*t + x[12])
+    dpdk2(x,t) = exp(x[7]*t)*sin(x[10]*t + x[13])
+    dpdk3(x,t) = exp(x[8]*t)*sin(x[11]*t + x[14])
+    dpdk4(x,t) = 0.0
+    dpdk5(x,t) = 1.0
+    dpdλ1(x,t) = x[1]*t*exp(x[6]*t)*sin(x[9]*t + x[12]) 
+    dpdλ2(x,t) = x[2]*t*exp(x[7]*t)*sin(x[10]*t + x[13])
+    dpdλ3(x,t) = x[3]*t*exp(x[8]*t)*sin(x[11]*t + x[14])
+    dpdω1(x,t) = x[1]*t*exp(x[6]*t)*cos(x[9]*t + x[12]) 
+    dpdω2(x,t) = x[2]*t*exp(x[7]*t)*cos(x[10]*t + x[13]) 
+    dpdω3(x,t) = x[3]*t*exp(x[8]*t)*cos(x[11]*t + x[14]) 
+    dpdδ1(x,t) = x[1]*exp(x[6]*t)*cos(x[9]*t + x[12]) 
+    dpdδ2(x,t) = x[2]*exp(x[7]*t)*cos(x[10]*t + x[13]) 
+    dpdδ3(x,t) = x[3]*exp(x[8]*t)*cos(x[11]*t + x[14]) 
+    h = [dtdk1 dtdk2 dtdk3 dtdk4 dtdk5 dtdλ1 dtdλ2 dtdλ3 dtdω1 dtdω2 dtdω3 dtdδ1 dtdδ2 dtdδ3;
+         dpdk1 dpdk2 dpdk3 dpdk4 dpdk5 dpdλ1 dpdλ2 dpdλ3 dpdω1 dpdω2 dpdω3 dpdδ1 dpdδ2 dpdδ3]
 
     # Instantiate Linear Least Squares Estimator
     xhat0 = [0.5, 0.25, 0.125, 0.0, 0.0, -0.15, 0.06, 
             -0.03, 0.26, 0.55, 0.95, 0.01, 0.01, 0.01]
-    nllse = NonLinearLeastSquares(f, xhat0)
+    nllse = NonLinearLeastSquares(f, h, xhat0)
 
     # Generate Measurements
     ft(x,t) = [f[1](x,t), f[2](x,t)] .+ 0.0008.*randn(2)

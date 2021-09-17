@@ -1,7 +1,7 @@
 
 abstract type AbstractNonLinearLeastSquares end
 
-mutable struct NonLinearLeastSquares{BFVT, BFJVT}
+mutable struct NonLinearLeastSquares{BFVT, BFJVT} <: AbstractNonLinearLeastSquares
     # Basis functions where f[i] ∀ i ∈ [1, k] should be a function 
     # which takes the state and independant
     # variable as arguments (i.e f[i](x,tₖ) where tₖ is the time at 
@@ -78,7 +78,7 @@ function NonLinearLeastSquares(f::AbstractVector, h::AbstractMatrix, xhat::Abstr
         throw(ArgumentError("Provided jacobian does not have the correct number of columns."))
     end
 
-    NonLinearLeastSquares(f,h,Matrix{Float64}(undef, (0,0)), xhat, Vector{Float64}(undef, (0,0)), 
+    NonLinearLeastSquares(f,h,Matrix{Float64}(undef, (0,0)), xhat, Vector{Float64}(undef, 0), 
         Symmetric(Matrix{Float64}(undef, (0,0))), Vector{Float64}(undef, 0), ϵ, iMax)
 end
 
