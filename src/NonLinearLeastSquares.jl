@@ -109,6 +109,13 @@ function FeedMeasurementBatch!(nlls::AbstractNonLinearLeastSquares, ys::Abstract
     return nothing
 end
 
+function FeedMeasurementBatch!(nlls::AbstractNonLinearLeastSquares, ys::AbstractVector, ts::AbstractVector)
+    m = length(ys)
+    W = zeros(m,m)
+    for i in 1:m; W[i,i] = 1.0; end
+    FeedMeasurementBatch!(nlls, ys, W, ts)
+end
+
 function ComputeEstimate!(nlls::AbstractNonLinearLeastSquares)
 
     # Get requirements
